@@ -46,6 +46,28 @@ module.exports.login=async(req,res)=>{
         res.status(500).send(error);
     }
 }
+module.exports.toggleAvailability=async(req,res)=>{
+    try{
+        const token=req.headers.authorization&&req.headers.authorization.split(' ')[1];
+        if(!token){
+            return res.status(401).json({message:'Unauthorized'});
+        }
+        const decodedAcessToken=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
+        const captain=await Captain.findById(decodedAcessToken.id);
+        if(captain.isAvailable){
+            captain.isAvailable=false;
+        }
+        else{
+            captain.isAvailable=true;
+            //subscribe to the queue by long polling
+        }
+        await captain.save();
+        res.status(200).json({message:'Availability toggled successfully'});
+    }
+    catch(error){
+        res.status(500).send(error);
+    }
+}
 module.exports.logout=async(req,res)=>{
     try{
         const token=req.headers.authorization&&req.headers.authorization.split(' ')[1];

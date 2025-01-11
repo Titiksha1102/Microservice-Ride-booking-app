@@ -20,7 +20,7 @@ const captainSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    isActive: {
+    isAvailable: {
         type: Boolean,
         default: false
     }

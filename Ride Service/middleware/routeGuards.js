@@ -1,3 +1,4 @@
+const axios = require('axios');
 module.exports.userLoggedIn= async (req, res, next) => {
     const token = req.headers.authorization&&req.headers.authorization.split(' ')[1];
     if (!token) {
@@ -16,6 +17,6 @@ module.exports.userLoggedIn= async (req, res, next) => {
             message: 'You are not logged in'
         });
     }
-    req.body.userId=user.data._id;
+    //req.body.userId=user._id;
     next();
 }
