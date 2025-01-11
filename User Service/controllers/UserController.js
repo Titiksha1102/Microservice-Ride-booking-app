@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 module.exports.login=async(req,res)=>{
-    console.log('login');
+    
     const {email,password}=req.body;
     try{
         const user = await User
@@ -37,7 +37,7 @@ module.exports.logout=async(req,res)=>{
         if(!token){
             return res.status(401).json({message:'Unauthorized'});
         }
-        const decodedAcessToken=jwt.verify(token,process.env.USER_SECRET);
+        const decodedAcessToken=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
         const user=await User.findById(decodedAcessToken.id);
         const userRefreshToken=await RefreshToken.findOne({userId:user._id});
         if(userRefreshToken){
@@ -65,7 +65,13 @@ module.exports.registerUser = async (req, res) => {
 
 module.exports.Profile = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const token = req.headers.authorization&&req.headers.authorization.split(' ')[1];
+        if(!token){
+            return res.status(401).json({message:'Unauthorized'});
+        }
+        const decodedAcessToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+        const user = await User.findById(decodedAcessToken.id);
         if (!user) {
             return res.status(404).send();
         }
@@ -116,10 +122,12 @@ module.exports.RenewAccessToken=async(req,res)=>{
         if(!userRefreshToken){
             return res.status(401).json({message:'Unauthorized'});
         }
+        const user=await User.findById(decodedRefreshToken.id);
         const accessToken = jwt.sign({ email:user.email,id:user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '3m' });
         res.status(200).json({ accessToken });
     }
     catch(error){
+        console.log(error);
         res.status(500).send(error);
     }
 }
