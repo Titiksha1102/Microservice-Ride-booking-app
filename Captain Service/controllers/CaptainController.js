@@ -2,6 +2,7 @@ const Captain = require('../models/Captain');
 const RefreshToken = require('../models/RefreshToken');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const rabbitMQ=require('../service/rabbit');
 require('dotenv').config();
 
 module.exports.RenewAccessToken=async(req,res)=>{
@@ -59,6 +60,15 @@ module.exports.toggleAvailability=async(req,res)=>{
         }
         else{
             captain.isAvailable=true;
+            const newRide=await rabbitMQ.subscribeToQueue('ride',async (message)=>{
+                let rideDetails=JSON.parse(message.content);
+                captain.isAvailable=false;
+                captain.save();
+                console.log('Ride details:',rideDetails._id);
+                rideDetails=await axios.post('${RIDE_SERVICE_URL}/acceptRide',
+                    {rideDetails},
+                    {headers:{Authorization:`Bearer ${token}`}});
+            })
             //subscribe to the queue by long polling
         }
         await captain.save();

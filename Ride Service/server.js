@@ -9,7 +9,7 @@ connectDB();
   async () => {
     try {
       await rabbitMQ.connect();
-      //await rabbitMQ.publishToQueue('ride', 'Ride Service is running');
+      
       server.use(express.json());
       server.use('/ride', RideRoutes);
 

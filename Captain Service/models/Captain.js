@@ -25,4 +25,4 @@ const captainSchema = new mongoose.Schema({
         default: false
     }
 })
-module.exports=mongoose.model('User',captainSchema)
+module.exports=mongoose.model('Captain',captainSchema)

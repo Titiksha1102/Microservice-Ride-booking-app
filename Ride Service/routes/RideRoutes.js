@@ -7,9 +7,9 @@ const routeGuards = require('../middleware/routeGuards');
 router.post('/createRide',routeGuards.userLoggedIn,RideController.createRide);
 
 // Accept a ride (to be accessed by captain)
-router.post('/:id/accept', RideController.acceptRide);
+router.post('/accept/:id',routeGuards.captainLoggedIn, RideController.acceptRide);
 
 // Cancel a ride (can be accessed by both user and captain)
-router.post('/:id/cancel', RideController.cancelRide);
+router.post('/cancel/:id',routeGuards.rideExists,RideController.cancelRide);
 
 module.exports = router;
