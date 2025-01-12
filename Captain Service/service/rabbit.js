@@ -18,8 +18,9 @@ async function subscribeToQueue(queue, callback) {
         channel.consume(queue, (message) => {
             if (message!=null) {
                 
-                callback(message);
+                
                 channel.ack(message);
+                callback(message);
             }
         });
     } catch (error) {

@@ -3,7 +3,7 @@ const RefreshToken = require('../models/RefreshToken');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const rabbitMQ=require('../service/rabbit');
-require('dotenv').config();
+const axios=require('axios');
 
 module.exports.RenewAccessToken=async(req,res)=>{
     const refreshToken=req.body.refreshToken;
@@ -47,37 +47,55 @@ module.exports.login=async(req,res)=>{
         res.status(500).send(error);
     }
 }
-module.exports.toggleAvailability=async(req,res)=>{
-    try{
-        const token=req.headers.authorization&&req.headers.authorization.split(' ')[1];
-        if(!token){
-            return res.status(401).json({message:'Unauthorized'});
+module.exports.toggleAvailability = async (req, res) => {
+    try {
+        const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ message: 'Unauthorized' });
         }
-        const decodedAcessToken=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
-        const captain=await Captain.findById(decodedAcessToken.id);
-        if(captain.isAvailable){
-            captain.isAvailable=false;
-        }
-        else{
-            captain.isAvailable=true;
-            const newRide=await rabbitMQ.subscribeToQueue('ride',async (message)=>{
-                let rideDetails=JSON.parse(message.content);
-                captain.isAvailable=false;
-                captain.save();
-                console.log('Ride details:',rideDetails._id);
-                rideDetails=await axios.post('${RIDE_SERVICE_URL}/acceptRide',
-                    {rideDetails},
-                    {headers:{Authorization:`Bearer ${token}`}});
-            })
-            //subscribe to the queue by long polling
-        }
+
+        const decodedAccessToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        const captain = await Captain.findById(decodedAccessToken.id);
+
+        // Toggle availability
+        captain.isAvailable = !captain.isAvailable;
         await captain.save();
-        res.status(200).json({message:'Availability toggled successfully'});
+
+        // Only subscribe to queue if the captain becomes available
+        if (captain.isAvailable) {
+            console.log('Captain is now available, listening for ride requests...');
+
+            rabbitMQ.subscribeToQueue('ride', async (message) => {
+                if (!captain.isAvailable) {
+                    console.log('Captain is no longer available, ignoring message.');
+                    return;
+                }
+
+                // Parse the ride details
+                const rideDetails = JSON.parse(message.content);
+                console.log('Ride details received:', rideDetails._id);
+
+                // Accept the ride and set captain as unavailable
+                captain.isAvailable = false;
+                await captain.save(); // Save the captain's updated status
+
+                // Notify the ride service about the acceptance
+                await axios.post(
+                    `${process.env.RIDE_SERVICE_URL}/accept/${rideDetails._id}`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+
+                console.log('Ride accepted successfully.');
+            });
+        }
+
+        res.status(200).json({ message: 'Availability toggled successfully' });
+    } catch (error) {
+        console.error('Error toggling availability:', error);
+        res.status(500).json({ error: error.message });
     }
-    catch(error){
-        res.status(500).send(error);
-    }
-}
+};
+
 module.exports.logout=async(req,res)=>{
     try{
         const token=req.headers.authorization&&req.headers.authorization.split(' ')[1];

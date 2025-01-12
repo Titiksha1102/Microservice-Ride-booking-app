@@ -15,9 +15,9 @@ module.exports.captainLoggedIn = async (req, res, next) => {
             return res.status(401).json({ message: 'Unauthorized' });
         }
         const captainRefreshToken = await RefreshToken.findOne({ captainId: captain._id });
-        console.log(captainRefreshToken);
+        
         if(!captainRefreshToken){
-            return res.status(401).json({ message: 'User not logged in' });
+            return res.status(401).json({ message: 'Captain not logged in' });
         }
         req.user = captain;
 
@@ -36,8 +36,8 @@ module.exports.captainNotLoggedIn = async (req, res, next) => {
             const token=await RefreshToken.findOne({captainId:captain._id});
             console.log(token);
             if (token) {
-                console.log('You are already logged in.');
-                return res.status(400).send({ error: 'You are already logged in.' });
+                console.log('Captain already logged in.');
+                return res.status(400).send({ error: 'Captain already logged in.' });
             }
         }
         next();
