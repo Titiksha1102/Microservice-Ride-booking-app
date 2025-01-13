@@ -14,10 +14,11 @@ async function connect() {
 
 async function subscribeToQueue(queue, callback) {
     try {
-        await channel.assertQueue(queue, { durable: true });
+        const qdetails=await channel.assertQueue(queue, { durable: true });
+        
         channel.consume(queue, (message) => {
             if (message !== null) {
-                
+                console.log(qdetails.messageCount);
                 channel.ack(message);
                 callback(message.content.toString());
             }
@@ -29,17 +30,27 @@ async function subscribeToQueue(queue, callback) {
 
 async function publishToQueue(queue, message) {
     try {
-        await channel.assertQueue(queue, { durable: true });
+        const qdetails=await channel.assertQueue(queue, { durable: true });
+        console.log(qdetails.messageCount);
         channel.sendToQueue(queue, Buffer.from(message));
     } catch (error) {
         console.error('Failed to publish to queue', error);
     }
 }
-
+async function clearQueue(queue) {
+    try {
+        const qdetails = await channel.assertQueue(queue, { durable: true });
+        const purged = await channel.purgeQueue(queue);
+        console.log(`Cleared ${purged.messageCount} messages from the queue: ${queue}`);
+    } catch (error) {
+        console.error('Failed to clear the queue', error);
+    }
+}
 
 
 module.exports = {
     connect,
     subscribeToQueue,
-    publishToQueue
+    publishToQueue,
+    clearQueue
 };

@@ -18,9 +18,8 @@ async function subscribeToQueue(queue, callback) {
         channel.consume(queue, (message) => {
             if (message!=null) {
                 console.log(message.content.toString());
-                
-                channel.ack(message);
                 callback(message);
+                channel.ack(message);
             }
         });
     } catch (error) {
@@ -31,7 +30,7 @@ async function subscribeToQueue(queue, callback) {
 async function publishToQueue(queue, message) {
     try {
         await channel.assertQueue(queue, { durable: true });
-        channel.sendToQueue(queue, Buffer.from(message));
+        channel.sendToQueue(queue, Buffer.from(message), { persistent: true });
         console.log('Published to queue');
     } catch (error) {
         console.error('Failed to publish to queue', error);
