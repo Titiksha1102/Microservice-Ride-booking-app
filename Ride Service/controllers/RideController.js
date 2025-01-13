@@ -68,18 +68,19 @@ exports.cancelRide = async (req, res) => {
 
 exports.completeRide = async (req, res) => {
     try {
-        const rideId=req.body.rideId;
+        const rideId=req.params.id;
         const ride = await Ride.findById(rideId);
         if (!ride) {
             return res.status(404).send();
         }
-        if (req.captainId.equals(ride.captainId) && ride.status === 'accepted') {
+        if (ride.status === 'accepted') {
             ride.status = 'completed';
             await ride.save();
             return res.send(ride);
         }
         res.status(400).send({ error: 'Ride cannot be completed' });
     } catch (error) {
+        console.log(error)
         res.status(500).send(error);
     }
 };

@@ -1,4 +1,5 @@
 const axios = require('axios');
+const Ride=require('../models/Ride')
 module.exports.userLoggedIn= async (req, res, next) => {
     const token = req.headers.authorization&&req.headers.authorization.split(' ')[1];
     if (!token) {
@@ -22,6 +23,7 @@ module.exports.userLoggedIn= async (req, res, next) => {
 }
 module.exports.captainLoggedIn= async (req, res, next) => {
     const token = req.headers.authorization&&req.headers.authorization.split(' ')[1];
+    console.log("captain's token:",token)
     if (!token) {
         return res.status(401).json({
             message: 'You are not logged in'
@@ -44,6 +46,7 @@ module.exports.captainLoggedIn= async (req, res, next) => {
 module.exports.rideExists= async (req, res, next) => {
     
     const ride = await Ride.findById(req.params.id);
+    
     if (!ride) {
         return res.status(404).send();
     }

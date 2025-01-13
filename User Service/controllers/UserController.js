@@ -21,8 +21,8 @@ module.exports.login=async(req,res)=>{
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
-        const accessToken = jwt.sign({ email:user.email,id:user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '3m' });
-        const refreshToken = jwt.sign({ email:user.email,id:user._id }, process.env.REFRESH_TOKEN_SECRET);
+        const accessToken = generateAccessToken(user)
+        const refreshToken = generateRefreshToken(user)
         const token=new RefreshToken({refreshToken:refreshToken,userId:user._id});
         token.save();
         res.status(200).json({ accessToken, refreshToken });
@@ -123,11 +123,17 @@ module.exports.RenewAccessToken=async(req,res)=>{
             return res.status(401).json({message:'Unauthorized'});
         }
         const user=await User.findById(decodedRefreshToken.id);
-        const accessToken = jwt.sign({ email:user.email,id:user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '3m' });
+        const accessToken = generateAccessToken(user)
         res.status(200).json({ accessToken });
     }
     catch(error){
         console.log(error);
         res.status(500).send(error);
     }
+}
+function generateAccessToken(user) {
+    return jwt.sign({ email: user.email, id: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+}
+function generateRefreshToken(user) {
+    return jwt.sign({ email: user.email, id: user._id }, process.env.REFRESH_TOKEN_SECRET);
 }

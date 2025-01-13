@@ -11,5 +11,6 @@ router.post('/accept/:id',routeGuards.captainLoggedIn, RideController.acceptRide
 
 // Cancel a ride (can be accessed by both user and captain)
 router.post('/cancel/:id',routeGuards.rideExists,RideController.cancelRide);
+router.post('/complete/:id',routeGuards.rideExists,RideController.completeRide)
 
 module.exports = router;
