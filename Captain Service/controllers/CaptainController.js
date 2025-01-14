@@ -2,8 +2,6 @@ const Captain = require('../models/Captain');
 const RefreshToken = require('../models/RefreshToken');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const rabbitMQ=require('../service/rabbit')
-const axios=require('axios')
 require('dotenv').config();
 
 module.exports.RenewAccessToken=async(req,res)=>{
@@ -14,8 +12,7 @@ module.exports.RenewAccessToken=async(req,res)=>{
     }
     try{
         const decodedRefreshToken=jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET);
-        const captain=await Captain.findById(decodedRefreshToken.id)
-        const accessToken =generateAccessToken(captain) 
+        const accessToken = jwt.sign({ email:decodedRefreshToken.email,id:decodedRefreshToken.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '3m' });
         res.status(200).json({ accessToken });
     }
     catch(error){
@@ -39,8 +36,8 @@ module.exports.login=async(req,res)=>{
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
-        const accessToken = generateAccessToken(captain)
-        const refreshToken = generateRefreshToken(captain)
+        const accessToken = jwt.sign({ email:captain.email,id:captain._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '3m' });
+        const refreshToken = jwt.sign({ email:captain.email,id:captain._id }, process.env.REFRESH_TOKEN_SECRET);
         const token=new RefreshToken({refreshToken:refreshToken,captainId:captain._id});
         token.save();
         res.status(200).json({ accessToken, refreshToken });
@@ -49,55 +46,28 @@ module.exports.login=async(req,res)=>{
         res.status(500).send(error);
     }
 }
-module.exports.toggleAvailability = async (req, res) => {
-    try {
-        const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
-        if (!token) {
-            return res.status(401).json({ message: 'Unauthorized' });
+module.exports.toggleAvailability=async(req,res)=>{
+    try{
+        const token=req.headers.authorization&&req.headers.authorization.split(' ')[1];
+        if(!token){
+            return res.status(401).json({message:'Unauthorized'});
         }
-
-        const decodedAccessToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-        const captain = await Captain.findById(decodedAccessToken.id);
-
-        // Toggle availability
-        captain.isAvailable = !captain.isAvailable;
+        const decodedAcessToken=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
+        const captain=await Captain.findById(decodedAcessToken.id);
+        if(captain.isAvailable){
+            captain.isAvailable=false;
+        }
+        else{
+            captain.isAvailable=true;
+            //subscribe to the queue by long polling
+        }
         await captain.save();
-
-        // Only subscribe to queue if the captain becomes available
-        if (captain.isAvailable) {
-            console.log('Captain is now available, listening for ride requests...');
-
-            rabbitMQ.subscribeToQueue('ride', async (message) => {
-                if (!captain.isAvailable) {
-                    console.log('Captain is no longer available, ignoring message.');
-                    return;
-                }
-
-                // Parse the ride details
-                const rideDetails = JSON.parse(message.content);
-                console.log('Ride details received:', rideDetails._id);
-
-                // Accept the ride and set captain as unavailable
-                captain.isAvailable = false;
-                await captain.save(); // Save the captain's updated status
-
-                // Notify the ride service about the acceptance
-                await axios.post(
-                    `${process.env.RIDE_SERVICE_URL}/accept/${rideDetails._id}`,{},
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-
-                console.log('Ride accepted successfully.');
-            });
-        }
-
-        res.status(200).json({ message: 'Availability toggled successfully' });
-    } catch (error) {
-        console.error('Error toggling availability:', error);
-        res.status(500).json({ error: error.message });
+        res.status(200).json({message:'Availability toggled successfully'});
     }
-};
-
+    catch(error){
+        res.status(500).send(error);
+    }
+}
 module.exports.logout=async(req,res)=>{
     try{
         const token=req.headers.authorization&&req.headers.authorization.split(' ')[1];
@@ -179,7 +149,7 @@ module.exports.deleteCaptainById = async (req, res) => {
 };
 
 function generateAccessToken(captain) {
-    return jwt.sign({ email: captain.email, id: captain._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+    return jwt.sign({ email: captain.email, id: captain._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '3m' });
 }
 function generateRefreshToken(captain) {
     return jwt.sign({ email: captain.email, id: captain._id }, process.env.REFRESH_TOKEN_SECRET);
