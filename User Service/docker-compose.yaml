@@ -1,0 +1,22 @@
+volumes:
+  mongo_data_folder:
+networks:
+  uber-user-ms:
+services:
+  
+  mongo-container:
+    image: mongo:4.4
+    ports: 
+      - 27017:27017
+    networks:
+      - uber-user-ms
+    volumes:
+      - mongo_data_folder:/data/db
+  node-app:
+    build: .
+    ports:
+      - 4001:4001
+    networks:
+      - uber-user-ms
+    depends_on:
+      - mongo-container
