@@ -1,0 +1,22 @@
+volumes:
+  mongo_data_folder_captain:
+networks:
+  uber-captain-ms:
+services:
+  
+  mongo-container-captain:
+    image: mongo:4.4
+    ports: 
+      - 27018:27017
+    networks:
+      - uber-captain-ms
+    volumes:
+      - mongo_data_folder_captain:/data/db
+  node-app:
+    image: titik002/uber-clone-captain-service:latest
+    ports:
+      - 4002:4002
+    networks:
+      - uber-captain-ms
+    depends_on:
+      - mongo-container-captain

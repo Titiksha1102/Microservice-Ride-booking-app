@@ -1,0 +1,22 @@
+volumes:
+  mongo_data_folder_ride:
+networks:
+  uber-ride-ms:
+services:
+  
+  mongo-container-ride:
+    image: mongo:4.4
+    ports: 
+      - 27019:27017
+    networks:
+      - uber-ride-ms
+    volumes:
+      - mongo_data_folder_ride:/data/db
+  node-app:
+    image: titik002/uber-clone-ride-service:latest
+    ports:
+      - 4003:4003
+    networks:
+      - uber-ride-ms
+    depends_on:
+      - mongo-container-ride

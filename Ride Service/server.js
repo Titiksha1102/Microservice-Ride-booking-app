@@ -14,7 +14,7 @@ connectDB();
       server.use('/ride', RideRoutes);
 
       server.get('/', (req, res) => {
-        res.send('Welcome to the express Home page\n');
+        res.send('Welcome to the ride service Home page\n');
       });
 
       server.listen(4003, () => {

@@ -14,7 +14,7 @@ connectDB();
       server.use('/captain', captainRoutes);
 
       server.get('/', (req, res) => {
-        res.send('Welcome to the express Home page\n');
+        res.send('Welcome to the captain service Home page\n');
       });
 
       server.listen(4002, () => {
