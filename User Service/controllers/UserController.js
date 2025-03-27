@@ -24,7 +24,7 @@ module.exports.login=async(req,res)=>{
         const accessToken = generateAccessToken(user)
         const refreshToken = generateRefreshToken(user)
         const token=new RefreshToken({refreshToken:refreshToken,userId:user._id});
-        token.save();
+        await token.save();
         res.status(200).json({ accessToken, refreshToken });
     }
     catch(error){
@@ -55,7 +55,13 @@ module.exports.logout=async(req,res)=>{
 
 module.exports.registerUser = async (req, res) => {
     try {
+        
+        const exist=await User.findOne({email:req.body.email})
+        if (exist){
+            return res.status(409).send('email already registered')
+        }
         const user = new User(req.body);
+        
         await user.save();
         res.status(201).send("user registered successfully");
     } catch (error) {

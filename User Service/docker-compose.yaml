@@ -20,3 +20,5 @@ services:
       - uber-user-ms
     depends_on:
       - mongo-container
+    environment:
+      - DB_URL=mongodb://mongo-container:27017/user-service
