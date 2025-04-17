@@ -16,12 +16,12 @@ async function connectRabbitMQ() {
         connection = await amqp.connect(process.env.RABBITMQ_URL);
         channel = await connection.createChannel();
         await channel.assertQueue(queue, { durable: true });
-        console.log('Connected to RabbitMQ and queue asserted');
+        console.log('Captain service Connected to RabbitMQ and queue asserted from socket server');
 
         // Consume messages once (not for each client)
         channel.consume(queue, (message) => {
             if (message !== null) {
-                const rideData = message.content.toString();
+                const rideData = JSON.parse(message.content.toString());
                 console.log(`New ride request: ${rideData}`);
                 
                 // Emit the ride request to all connected clients
@@ -38,7 +38,7 @@ async function connectRabbitMQ() {
         });
 
     } catch (error) {
-        console.error('Failed to connect to RabbitMQ:', error);
+        console.error('Captain service Failed to connect to RabbitMQ:', error);
     }
 }
 

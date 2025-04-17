@@ -1,13 +1,22 @@
-
+const axios = require('axios');
 const Ride = require('../models/Ride');
 const rabbitMQ = require('../service/rabbit');
 
 // Create a new ride
 exports.createRide = async (req, res) => {
     try {
-        
+        const token = req.headers.authorization
+            &&req.headers.authorization.split(' ')[1]
+            
+        const response = await axios.get(`${process.env.USER_SERVICE_URL}/profile`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+              },
+              withCredentials: true
+        })
+        const user=response.data
         const ride = new Ride({
-            userId: req.body.userId,
+            userId: user._id,
             pickup : req.body.pickup,
             drop: req.body.drop,
         });

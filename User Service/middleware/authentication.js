@@ -4,13 +4,13 @@ const RefreshToken = require('../models/RefreshToken');
 
 module.exports.userLoggedIn = async (req, res, next) => {
     try {
-        const token = req.headers.authorization&&req.headers.authorization.split(' ')[ 1 ];
+        const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
 
         if (!token) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
         const decodedAcessToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-        const user = await User.findById(decodedAcessToken.id);
+        const user = await User.findById(decodedAcessToken.userId);
         if (!user) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
@@ -37,7 +37,7 @@ module.exports.userNotLoggedIn = async (req, res, next) => {
             console.log(token);
             if (token) {
                 console.log('You are already logged in.');
-                return res.status(400).send({ error: 'You are already logged in.' });
+                return res.status(400).json({ message: 'You are already logged in.' });
             }
         }
         next();

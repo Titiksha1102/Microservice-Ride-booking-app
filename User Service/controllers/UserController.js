@@ -11,7 +11,8 @@ module.exports.login=async(req,res)=>{
         const user = await User
             .findOne({ email })
             .select('+password');
-
+        const userWithoutPassword=await User
+        .findOne({ email })
         if (!user) {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
@@ -25,7 +26,8 @@ module.exports.login=async(req,res)=>{
         const refreshToken = generateRefreshToken(user)
         const token=new RefreshToken({refreshToken:refreshToken,userId:user._id});
         await token.save();
-        res.status(200).json({ accessToken, refreshToken });
+        res.cookie("refreshToken", refreshToken);
+        res.json({ accessToken,refreshToken,user:userWithoutPassword })
     }
     catch(error){
         res.status(500).send(error);
@@ -69,15 +71,16 @@ module.exports.registerUser = async (req, res) => {
     }
 };
 
+
 module.exports.Profile = async (req, res) => {
     try {
-        const token = req.headers.authorization&&req.headers.authorization.split(' ')[1];
+        const token = (req.headers.authorization && req.headers.authorization.split(' ')[1]);
         if(!token){
             return res.status(401).json({message:'Unauthorized'});
         }
         const decodedAcessToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-        const user = await User.findById(decodedAcessToken.id);
+        const user = await User.findById(decodedAcessToken.userId);
         if (!user) {
             return res.status(404).send();
         }
@@ -119,18 +122,33 @@ module.exports.deleteUserById = async (req, res) => {
 };
 module.exports.RenewAccessToken=async(req,res)=>{
     try{
-        const refreshToken=req.body.refreshToken;
+        const refreshToken=req.cookies.refreshToken;
         if(!refreshToken){
             return res.status(401).json({message:'Unauthorized'});
         }
-        const decodedRefreshToken=jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET);
-        const userRefreshToken=await RefreshToken.findOne({userId:decodedRefreshToken.id});
+        let decodedRefreshToken=''
+        try {
+            decodedRefreshToken=jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET);
+            console.log('Decoded:', decodedRefreshToken);
+        } catch (err) {
+            if (err.name === 'TokenExpiredError') {
+                await RefreshToken.deleteOne({refreshToken:refreshToken})
+                console.error('Token has expired at:', err.expiredAt);
+                return res.status(401).json({message:"Your session has expired. Please login again."})
+                
+            } else {
+                console.error('Other JWT error:', err.message)
+                return res.status(500).send(error);
+            }
+        }
+        
+        const userRefreshToken=await RefreshToken.findOne({userId:decodedRefreshToken.userId});
         if(!userRefreshToken){
             return res.status(401).json({message:'Unauthorized'});
         }
-        const user=await User.findById(decodedRefreshToken.id);
+        const user=await User.findById(decodedRefreshToken.userId);
         const accessToken = generateAccessToken(user)
-        res.status(200).json({ accessToken });
+        res.status(200).json({ accessToken,user });
     }
     catch(error){
         console.log(error);
@@ -138,8 +156,8 @@ module.exports.RenewAccessToken=async(req,res)=>{
     }
 }
 function generateAccessToken(user) {
-    return jwt.sign({ email: user.email, id: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+    return jwt.sign({ email: user.email, userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
 }
 function generateRefreshToken(user) {
-    return jwt.sign({ email: user.email, id: user._id }, process.env.REFRESH_TOKEN_SECRET);
+    return jwt.sign({ email: user.email, userId: user._id }, process.env.REFRESH_TOKEN_SECRET,{expiresIn:'3d'});
 }

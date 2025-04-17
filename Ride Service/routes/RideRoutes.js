@@ -4,7 +4,7 @@ const RideController = require('../controllers/RideController');
 const routeGuards = require('../middleware/routeGuards');
 
 // Create a new ride
-router.post('/createRide',routeGuards.userLoggedIn,RideController.createRide);
+router.post('/createRide'/* ,routeGuards.userLoggedIn */,RideController.createRide);
 
 // Accept a ride (to be accessed by captain)
 router.post('/accept/:id',routeGuards.captainLoggedIn, RideController.acceptRide);

@@ -1,0 +1,21 @@
+Uber clone application within three different microservices as follows
+- Users Microservice
+- Captain Microservice
+- Rides Microservice
+Each service runs on separate container and has its own db
+
+Other components that help in communication between these microservices include:
+- Message broker queue
+- Web socket server
+
+A user creates a ride request using the create ride endpoint in rides microservice
+and pushes the ride req to queue.
+The captain dashboard subscribes to the queue via a web socket connection and listens to rides persistently
+The different pages in frontend include:
+User login
+User signup
+User ride booking page(user home)
+
+Captain login
+Captain signup
+Captain dashboard(new ride requests obtained from queue appear here)

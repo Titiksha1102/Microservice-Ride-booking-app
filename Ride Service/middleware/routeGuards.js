@@ -1,18 +1,23 @@
 const axios = require('axios');
 const Ride=require('../models/Ride')
 module.exports.userLoggedIn= async (req, res, next) => {
-    const token = req.headers.authorization&&req.headers.authorization.split(' ')[1];
-    if (!token) {
+    const accessToken=req.headers.authorization && req.headers.authorization.split(' ')[1]
+    const refreshTokenInCookie=req.cookies.refreshToken
+
+
+    if (!accessToken) {
         return res.status(401).json({
-            message: 'You are not logged in'
+            message: 'You are not logged in or token not retrieved correctly'
         });
     }
-    const user=axios.get(`${process.env.USER_SERVICE_URL}/profile`,{
+    const response=await axios.get(`${process.env.USER_SERVICE_URL}/profile`,{
         headers: {
-            Authorization: `Bearer ${token}`
-        }
+            Cookie: req.headers.cookie,
+            Authorization: `Bearer ${accessToken}`
+        },
+        withCredentials: true
     })
-    console.log(user);
+    const user=response.data
     if (!user) {
         return res.status(401).json({
             message: 'You are not logged in'

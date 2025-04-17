@@ -6,9 +6,9 @@ async function connect() {
     try {
         connection = await amqp.connect(process.env.RABBITMQ_URL);
         channel = await connection.createChannel();
-        console.log('Connected to RabbitMQ');
+        console.log('User service Connected to RabbitMQ');
     } catch (error) {
-        console.error('Failed to connect to RabbitMQ', error);
+        console.error('User service Failed to connect to RabbitMQ', error);
     }
 }
 
@@ -32,9 +32,9 @@ async function publishToQueue(queue, message) {
     try {
         await channel.assertQueue(queue, { durable: true });
         channel.sendToQueue(queue, Buffer.from(message));
-        console.log('Published to queue');
+        console.log('User service Published to queue');
     } catch (error) {
-        console.error('Failed to publish to queue', error);
+        console.error('User service Failed to publish to queue', error);
     }
 }
 

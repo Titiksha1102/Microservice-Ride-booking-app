@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const connect=async()=>{
     try {
         await mongoose.connect('mongodb://localhost:27017/ride-service');
-        console.log('MongoDB connected');
+        console.log('Ride service MongoDB connected');
     } catch (error) {
-        console.log('MongoDB connection error:',error);
+        console.log('Ride service MongoDB connection error:',error);
     }
 }
 
