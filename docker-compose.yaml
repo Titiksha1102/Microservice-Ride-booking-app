@@ -1,0 +1,79 @@
+
+
+networks:
+  uber-ms-network:
+    driver: bridge
+
+volumes:
+  mongo_data_folder_user:
+  mongo_data_folder_captain:
+  mongo_data_folder_ride:
+
+services:
+  # User Service
+  mongo-container-user:
+    image: mongo:4.4
+    ports: 
+      - 27017:27017
+      - 6000:9229
+    networks:
+      - uber-ms-network
+    volumes:
+      - mongo_data_folder_user:/data/db
+
+  user-service:
+    image: titik002/uber-clone-user-service:latest
+    ports:
+      - 4001:4001
+    networks:
+      - uber-ms-network
+    depends_on:
+      - mongo-container-user
+    environment:
+      - DB_URL=mongodb://mongo-container-user:27017/user-service
+
+  # Captain Service
+  mongo-container-captain:
+    image: mongo:4.4
+    ports: 
+      - 27018:27017
+      - 6001:9229
+      - 6002:9230
+    networks:
+      - uber-ms-network
+    volumes:
+      - mongo_data_folder_captain:/data/db
+
+  captain-service:
+    image: titik002/uber-clone-captain-service:latest
+    ports:
+      - 4002:4002
+    networks:
+      - uber-ms-network
+    depends_on:
+      - mongo-container-captain
+    environment:
+      - DB_URL=mongodb://mongo-container-captain:27017/captain-service
+
+  # Ride Service
+  mongo-container-ride:
+    image: mongo:4.4
+    ports: 
+      - 27019:27017
+      - 6003:9229
+    networks:
+      - uber-ms-network
+    volumes:
+      - mongo_data_folder_ride:/data/db
+
+  ride-service:
+    image: titik002/uber-clone-ride-service:latest
+    ports:
+      - 4003:4003
+    networks:
+      - uber-ms-network
+    depends_on:
+      - mongo-container-ride
+    environment:
+      - DB_URL=mongodb://mongo-container-ride:27017/ride-service
+      - USER_SERVICE_URL=http://user-service:4001/users  # Use service name here

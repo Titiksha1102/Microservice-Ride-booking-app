@@ -8,6 +8,7 @@ services:
     image: mongo:4.4
     ports: 
       - 27019:27017
+      - 6003:9229
     networks:
       - uber-ride-ms
     volumes:
@@ -20,3 +21,5 @@ services:
       - uber-ride-ms
     depends_on:
       - mongo-container-ride
+    environment:
+      - DB_URL=mongodb://mongo-container-ride:27017/ride-service

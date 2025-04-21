@@ -8,6 +8,8 @@ services:
     image: mongo:4.4
     ports: 
       - 27018:27017
+      - 6001:9229
+      - 6002:9230
     networks:
       - uber-captain-ms
     volumes:
@@ -20,3 +22,5 @@ services:
       - uber-captain-ms
     depends_on:
       - mongo-container-captain
+    environment:
+      - DB_URL=mongodb://mongo-container-captain:27017/captain-service

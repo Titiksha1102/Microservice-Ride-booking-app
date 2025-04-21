@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start-all": "concurrently \"npm start --prefix \\\"User Service\\\"\" \"npm start --prefix \\\"Captain Service\\\"\" \"npm start --prefix \\\"Ride Service\\\"\""
+    "start-all": "concurrently \"npm start --prefix \\\"UserService\\\"\" \"npm start --prefix \\\"CaptainService\\\"\" \"npm start --prefix \\\"RideService\\\"\""
   },
   "keywords": [],
   "author": "",

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"nodemon server.js\" \"nodemon socket-server.js\""
+    "start": "concurrently \"nodemon --inspect=0.0.0.0:9229 server.js\" \"nodemon --inspect=0.0.0.0:9230 socket-server.js\""
   },
   "keywords": [],
   "author": "",

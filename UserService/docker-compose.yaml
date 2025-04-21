@@ -4,10 +4,11 @@ networks:
   uber-user-ms:
 services:
   
-  mongo-container:
+  mongo-container-user:
     image: mongo:4.4
     ports: 
       - 27017:27017
+      - 6000:9229
     networks:
       - uber-user-ms
     volumes:
@@ -19,6 +20,6 @@ services:
     networks:
       - uber-user-ms
     depends_on:
-      - mongo-container
+      - mongo-container-user
     environment:
-      - DB_URL=mongodb://mongo-container:27017/user-service
+      - DB_URL=mongodb://mongo-container-user:27017/user-service

@@ -3,6 +3,7 @@ Uber clone application within three different microservices as follows
 - Captain Microservice
 - Rides Microservice
 Each service runs on separate container and has its own db
+All the microservices are coordinated using an API gateway. any request to any of the 3 services first reaches the gateway and then redirected to the appropriate service
 
 Other components that help in communication between these microservices include:
 - Message broker queue
