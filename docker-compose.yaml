@@ -13,9 +13,7 @@ services:
   # User Service
   mongo-container-user:
     image: mongo:4.4
-    ports: 
-      - 27017:27017
-      - 6000:9229
+    
     networks:
       - uber-ms-network
     volumes:
@@ -25,6 +23,7 @@ services:
     image: titik002/uber-clone-user-service:latest
     ports:
       - 4001:4001
+      - 9231:9231
     networks:
       - uber-ms-network
     depends_on:
@@ -35,10 +34,7 @@ services:
   # Captain Service
   mongo-container-captain:
     image: mongo:4.4
-    ports: 
-      - 27018:27017
-      - 6001:9229
-      - 6002:9230
+     
     networks:
       - uber-ms-network
     volumes:
@@ -48,6 +44,9 @@ services:
     image: titik002/uber-clone-captain-service:latest
     ports:
       - 4002:4002
+      - 4005:4005
+      - 9232:9232
+      - 9234:9234
     networks:
       - uber-ms-network
     depends_on:
@@ -58,9 +57,7 @@ services:
   # Ride Service
   mongo-container-ride:
     image: mongo:4.4
-    ports: 
-      - 27019:27017
-      - 6003:9229
+    
     networks:
       - uber-ms-network
     volumes:
@@ -70,6 +67,7 @@ services:
     image: titik002/uber-clone-ride-service:latest
     ports:
       - 4003:4003
+      - 9233:9233
     networks:
       - uber-ms-network
     depends_on:

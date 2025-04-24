@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --inspect=0.0.0.0:9229 server.js"
+    "start": "nodemon --inspect=0.0.0.0:9233 server.js"
   },
   "keywords": [],
   "author": "",

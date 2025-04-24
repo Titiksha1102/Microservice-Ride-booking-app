@@ -26,7 +26,11 @@ module.exports.login=async(req,res)=>{
         const refreshToken = generateRefreshToken(user)
         const token=new RefreshToken({refreshToken:refreshToken,userId:user._id});
         await token.save();
-        res.cookie("refreshToken", refreshToken);
+        res.cookie("refreshToken", refreshToken,
+            {
+                maxAge: 3 * 24 * 60 * 60 * 1000
+            }
+        );
         res.json({ accessToken,refreshToken,user:userWithoutPassword })
     }
     catch(error){
