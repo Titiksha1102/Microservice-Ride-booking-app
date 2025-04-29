@@ -35,5 +35,4 @@
 - **DevOps:** Docker, Docker Compose
 - **API Management:** API Gateway (e.g., NGINX or custom Node gateway)
 
-## 📁 Project Structure
 
