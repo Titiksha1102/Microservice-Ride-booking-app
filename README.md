@@ -25,7 +25,7 @@
 
 ## 📸 Demo
 
-▶️ **[Watch Full Demonstration of TezzRides](https://your-demo-link-here.com)**
+▶️ **[Watch Full Demonstration of TezzRides](https://youtu.be/KTThd4RJKhc)**
 
 ## 📦 Tech Stack
 
