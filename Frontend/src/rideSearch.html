@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="ride-container" class="flex max-w-full h-screen m-3 gap-2">
+        <div id="search-panel" class="border-2 border-gray-300 rounded w-[35%] h-full">
+            <div id="from-search-box" class="mx-2 mt-5" >
+                <input type="text" placeholder="From" class="rounded-md bg-gray-300 w-[100%] h-[100%] p-2"/>
+            </div>
+            <div id="to-search-box" class="mx-2 mt-5">
+                <input type="text" placeholder="To" class="rounded-md bg-gray-300 w-[100%] h-[100%] p-2"/>
+            </div>
+            <div id="ride-options">
+                <div id="ride-option" class="flex flex-col border-2 border-gray-300 rounded-md p-2 m-2">
+                    <div class="flex justify-between">
+                        <span id="vehicle">Car</span>
+                    <span id="fare">Rs. 200</span>
+                    </div>
+                    <div class="flex justify-end">
+                        <span id="distance">distance</span>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div id="map-with-dist" class="border-2 border-gray-300 w-[65%]">this is map</div>
+    </div>
+</body>
+</html>

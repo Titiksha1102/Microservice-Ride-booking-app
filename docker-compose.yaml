@@ -74,4 +74,4 @@ services:
       - mongo-container-ride
     environment:
       - DB_URL=mongodb://mongo-container-ride:27017/ride-service
-      - USER_SERVICE_URL=http://user-service:4001/users  # Use service name here
+      - USER_SERVICE_URL=http://user-service:4001/users  
