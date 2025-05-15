@@ -17,7 +17,7 @@ const center = {
 
 function MyComponent() {
   return (
-    <APIProvider apiKey="AIzaSyBCIp7JfZkdYNu6v1V-5F7tlcVPpXNmMDg">
+    <APIProvider apiKey="">
       <div style={{ height: '100vh', width: '100vw'}}>
         <Map center={center} 
         zoom={12}

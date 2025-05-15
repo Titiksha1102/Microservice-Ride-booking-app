@@ -20,7 +20,7 @@ const defaultCenter = {
 const PlacesComponent2 = () => {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyBCIp7JfZkdYNu6v1V-5F7tlcVPpXNmMDg", // Replace with your API key
+    googleMapsApiKey: import.meta.env.VITE_MAP_API_KEY, // Replace with your API key
     libraries: ["places", "geometry"],
   });
 

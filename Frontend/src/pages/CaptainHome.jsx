@@ -11,7 +11,7 @@ const CaptainHome = () => {
   // Load Google Maps API
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyBCIp7JfZkdYNu6v1V-5F7tlcVPpXNmMDg", // 🔐 Replace with your key
+    googleMapsApiKey: import.meta.env.VITE_MAP_API_KEY, // 🔐 Replace with your key
     libraries: libraries,
   });
 
