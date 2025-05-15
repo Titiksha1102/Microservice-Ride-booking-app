@@ -4,7 +4,7 @@ import { APIProvider,
     AdvancedMarker, 
     useMapsLibrary } from "@vis.gl/react-google-maps";
 
-const apiKey = "AIzaSyBCIp7JfZkdYNu6v1V-5F7tlcVPpXNmMDg"; // Replace with your API Key
+const apiKey = import.meta.env.VITE_MAP_API_KEY; // Replace with your API Key
 try {
   
 } catch (error) {

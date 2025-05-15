@@ -14,7 +14,7 @@ const defaultCenter = {
 const PlacesComponent = () => {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyBCIp7JfZkdYNu6v1V-5F7tlcVPpXNmMDg",
+    googleMapsApiKey: import.meta.env.VITE_MAP_API_KEY,
     libraries: ["places"],
   });
 
