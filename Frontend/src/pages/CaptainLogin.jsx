@@ -1,25 +1,26 @@
 import { useContext, useState } from "react"
 import { useNavigate,Link } from 'react-router-dom'
 import axios from 'axios'
-import { UserContext } from "../contexts/UserContext"
-const UserLogin=()=>{
+import { CaptainContext } from "../contexts/CaptainContext"
+const CaptainLogin=()=>{
     const [email,setEmail]=useState('')
     const [password,setPassword]=useState('')
-    const context=useContext(UserContext)
+    const context=useContext(CaptainContext)
     const navigate=useNavigate()
     async function submitHandler(){
-        const user={
+        const captain={
             email:email,
             password:password
         }
         try {
-            const response=await axios.post("http://localhost:4001/users/login",user,{withCredentials: true})
+            const response=await axios.post("http://localhost:4002/captains/login",captain,{withCredentials: true})
             const data=response.data
+            console.log(data.accessToken)
             context.setAccessToken(data.accessToken)
             //context.setRefreshToken(data.refreshToken)
-            context.setEmail(user.email)
+            context.setEmail(captain.email)
             console.log(context.email==='')
-            navigate('/user/home')
+            navigate('/captain/home')
         } catch (error) {
             console.log(error)
             navigate('/error')
@@ -41,11 +42,11 @@ const UserLogin=()=>{
 
             <button type="submit"
                 className="bg-black rounded-md text-white p-2" onClick={submitHandler}>Login</button><br />
-            <span>Don't have an account? <Link to='/user/signup' className="text-blue-600">Create an account</Link></span><br></br>
-            <span>Want to drive for <i>TezzRides</i>? <Link to='/captain/login' className="text-blue-600">Login as captain</Link></span>
+            <span>Don't have an account? <Link to='/captain/signup' className="text-blue-600">Create an account as captain</Link></span><br></br>
+            <span>Want to book a ride ? <Link to='/user/login' className="text-blue-600">Login as rider</Link></span>
 
 
         </div>
     )
 }
-export default UserLogin
+export default CaptainLogin

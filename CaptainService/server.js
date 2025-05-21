@@ -18,7 +18,7 @@ connectDB();
               credentials: true,
             }));
             server.use(cookieParser());
-      server.use('/captain', captainRoutes);
+      server.use('/captains', captainRoutes);
 
       server.get('/', (req, res) => {
         res.send('Welcome to the captain service Home page\n');

@@ -3,20 +3,24 @@ const RefreshToken = require('../models/RefreshToken');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const rabbitMQ=require('../service/rabbit')
-const axios=require('axios')
+const axios=require('axios');
+const { use } = require('react');
 require('dotenv').config();
 
 module.exports.RenewAccessToken=async(req,res)=>{
-    const refreshToken=req.body.refreshToken;
-    const refreshTokenFromDB=await RefreshToken.findOne({refreshToken:refreshToken});
-    if(!refreshTokenFromDB){
-        return res.status(400).json({message:'Invalid refresh token'});
+    const refreshToken=req.cookies.refreshToken;
+    if(!refreshToken){
+        return res.status(401).json({message:'Unauthorized'});
+    }
+    const refreshTokenfromDB=await RefreshToken.findOne({refreshToken:refreshToken});
+    if(!refreshTokenfromDB){
+        return res.status(403).json({message:'Forbidden/Invalid refresh token'});
     }
     try{
         const decodedRefreshToken=jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET);
         const captain=await Captain.findById(decodedRefreshToken.id)
         const accessToken =generateAccessToken(captain) 
-        res.status(200).json({ accessToken });
+        res.status(200).json({ accessToken,user:{name:captain.name} });
     }
     catch(error){
         res.status(500).send(error);
@@ -29,7 +33,8 @@ module.exports.login=async(req,res)=>{
         const captain = await Captain
             .findOne({ email })
             .select('+password');
-
+        const captainWithoutPassword=await Captain
+                .findOne({ email })
         if (!captain) {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
@@ -43,7 +48,12 @@ module.exports.login=async(req,res)=>{
         const refreshToken = generateRefreshToken(captain)
         const token=new RefreshToken({refreshToken:refreshToken,captainId:captain._id});
         token.save();
-        res.status(200).json({ accessToken, refreshToken });
+        res.cookie("refreshToken", refreshToken,
+            {
+                maxAge: 7 * 24 * 60 * 60 * 1000
+            }
+        );
+        res.json({ accessToken,refreshToken,captain:captainWithoutPassword })
     }
     catch(error){
         res.status(500).send(error);
@@ -154,6 +164,7 @@ module.exports.registerCaptain = async (req, res) => {
         await captain.save();
         res.status(201).send("Captain registered successfully");
     } catch (error) {
+        console.error(error);
         res.status(400).send(error);
     }
 };
@@ -209,5 +220,5 @@ function generateAccessToken(captain) {
     return jwt.sign({ email: captain.email, id: captain._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
 }
 function generateRefreshToken(captain) {
-    return jwt.sign({ email: captain.email, id: captain._id }, process.env.REFRESH_TOKEN_SECRET);
+    return jwt.sign({ email: captain.email, id: captain._id }, process.env.REFRESH_TOKEN_SECRET,{ expiresIn: '7d' });
 }

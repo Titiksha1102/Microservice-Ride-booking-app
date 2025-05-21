@@ -20,6 +20,10 @@ const captainSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    licenseNumber: {
+        type: String,
+        required: true
+    },
     isAvailable: {
         type: Boolean,
         default: false

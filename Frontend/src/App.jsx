@@ -18,6 +18,10 @@ import UserHome from './pages/userHome'
 import CaptainHome from './pages/CaptainHome'
 import Landing from './pages/Landing'
 import Layout from './components/Layout'
+import CaptainSignup from './pages/CaptainSignup'
+import CaptainLogin from './pages/CaptainLogin'
+import CaptainProtectedRoute from './components/CaptainProtectedRoute'
+import CaptainPublicRoute from './components/CaptainPublicRoute'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -34,11 +38,14 @@ function App() {
             <Route path='/user/login' element={<UserLogin />}></Route>
             <Route path='/user/signup' element={<UserSignup />}></Route>
           </Route>
-
-          <Route path='/captain/home' element={<CaptainHome />}></Route>
-          <Route path='/captain/login'></Route>
-          <Route path='/captain/signup'></Route>
-
+          <Route element={<CaptainProtectedRoute />}>
+            <Route path='/captain/home' element={<CaptainHome />}></Route>
+          </Route>
+          <Route element={<CaptainPublicRoute />}>
+            <Route path='/' element={<Landing />}></Route>
+            <Route path='/captain/login' element={<CaptainLogin />}></Route>
+            <Route path='/captain/signup' element={<CaptainSignup />}></Route>
+          </Route>
           <Route path='/places' element={<PlacesComponent4 />}></Route>
           <Route path='/error' element={<Error />}></Route>
         </Routes>
