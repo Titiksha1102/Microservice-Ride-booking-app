@@ -1,87 +1,177 @@
-import { useContext, useState } from "react"
-import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
-import { CaptainContext } from "../contexts/CaptainContext"
-const CaptainSignup=()=>{
-    const [name,setName]=useState('')
-    const [email,setEmail]=useState('')
-    const [password,setPassword]=useState('')
-    const [vehicleNumber,setVehicleNumber]=useState('')
-    const [licenseNumber,setLicenseNumber]=useState('')
-    const [warning,setWarning]=useState('')
-    const context=useContext(CaptainContext)
-    const navigate=useNavigate()
-    function emailexistnavigate(){
-        navigate('/captain/login')
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import * as Yup from "yup";
+import { CaptainContext } from "../contexts/CaptainContext";
+
+const CaptainSignup = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [vehicleNumber, setVehicleNumber] = useState("");
+  const [licenseNumber, setLicenseNumber] = useState("");
+  const [errors, setErrors] = useState({});
+  const [warning, setWarning] = useState("");
+
+  const context = useContext(CaptainContext);
+  const navigate = useNavigate();
+
+  const captainSchema = Yup.object().shape({
+    name: Yup.string()
+      .min(2, "Name must be at least 2 characters")
+      .required("Name is required"),
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("Email is required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
+    vehicleNumber: Yup.string()
+      .matches(
+        /^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/,
+        "Invalid vehicle number format"
+      )
+      .required("Vehicle number is required"),
+    licenseNumber: Yup.string()
+      .matches(/^[A-Z0-9]{8,15}$/, "Invalid license number")
+      .required("License number is required"),
+  });
+
+  async function submitHandler() {
+    const captain = {
+      name,
+      email,
+      password,
+      vehicleNumber,
+      licenseNumber,
+    };
+
+    try {
+      // Clear previous errors
+      setErrors({});
+      setWarning("");
+
+      // Validate using Yup
+      await captainSchema.validate(captain, { abortEarly: false });
+
+      // Send request if validation passes
+      const response = await axios.post(
+        "http://localhost:4002/captains/register",
+        captain
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        return navigate("/captain/login");
+      }
+
+      if (response.status === 409) {
+        setWarning(
+          'Email already exists. Use another email or <a href="/captain/login" class="text-blue-600 underline">login</a> to recover your account.'
+        );
+        return navigate("/captain/signup");
+      }
+
+      return navigate("/error");
+    } catch (err) {
+      if (err.name === "ValidationError") {
+        // Convert Yup errors into a field-wise object
+        const fieldErrors = {};
+        err.inner.forEach((e) => {
+          fieldErrors[e.path] = e.message;
+        });
+        setErrors(fieldErrors);
+      } else {
+        console.error(err);
+        navigate("/error");
+      }
     }
-    async function submitHandler(){
-        const captain={
-            name:name,
-            email:email,
-            password:password,
-            vehicleNumber:vehicleNumber,
-            licenseNumber:licenseNumber
-        }
-        const response=await axios.post("http://localhost:4002/captains/register",captain)
-        if (response.status===200||response.status===201){
-            return navigate('/captain/login')
-        }
-        if (response.status===409){
-            setWarning('Email already exists.Use another email or <a onClick={emailexistnavigate}>login</a> to recover your account')
-            return await navigate('/captain/signup')
-        }
-        else{
-            console.log(response)
-            return await navigate('/error')
-        }
-    }
-    return(
-        <div>
-            <h3>Sign Up</h3>
-            <p>{warning}</p>
-            <input 
-            type="text" 
-            placeholder="Name" 
-            value={name} 
-            onChange={(e)=>{setName(e.target.value)}}
-            className="border-gray-500 border-2 rounded-md p-2 m-2"></input><br/>
-            
-            <input type="email" placeholder="Email"
-            value={email} 
-            onChange={(e)=>{setEmail(e.target.value)}}
-            className="border-gray-500 border-2 rounded-md p-2 m-2"></input><br/>
+  }
 
-            <input type="password" placeholder="Password"
-            value={password} 
-            onChange={(e)=>{setPassword(e.target.value)}}
-            className="border-gray-500 border-2 rounded-md p-2 m-2"></input><br/>
+  return (
+    <div>
+      <h3>Sign Up</h3>
+      {warning && <p className="text-red-600" dangerouslySetInnerHTML={{ __html: warning }} />}
 
-            <input 
-            type="text" 
-            placeholder="Vehicle Number" 
-            value={vehicleNumber} 
-            onChange={(e)=>{setVehicleNumber(e.target.value)}}
-            className="border-gray-500 border-2 rounded-md p-2 m-2"></input><br/>
-            
-            <input 
-            type="text" 
-            placeholder="Driving License Number" 
-            value={licenseNumber} 
-            onChange={(e)=>{setLicenseNumber(e.target.value)}}
-            className="border-gray-500 border-2 rounded-md p-2 m-2"></input><br/>
+      <input
+        type="text"
+        placeholder="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="border-gray-500 border-2 rounded-md p-2 m-2"
+      />
+      {errors.name && <p className="text-red-600 ml-2">{errors.name}</p>}
 
-            <input 
-            type="file" 
-            placeholder="Driving License" 
-             
-            onChange={(e)=>{}}
-            className="border-gray-500 border-2 rounded-md p-2 m-2"></input><br/>
+      <br />
 
-            <button type="submit" onClick={submitHandler}
-            className="bg-black rounded-md text-white p-2">Sign Up</button><br/>
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="border-gray-500 border-2 rounded-md p-2 m-2"
+      />
+      {errors.email && <p className="text-red-600 ml-2">{errors.email}</p>}
 
-            <span>Already have an account? <Link to='/captain/login' className="text-blue-600">Login here</Link></span>
-        </div>
-    )
-}
-export default CaptainSignup
+      <br />
+
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="border-gray-500 border-2 rounded-md p-2 m-2"
+      />
+      {errors.password && <p className="text-red-600 ml-2">{errors.password}</p>}
+
+      <br />
+
+      <input
+        type="text"
+        placeholder="Vehicle Number"
+        value={vehicleNumber}
+        onChange={(e) => setVehicleNumber(e.target.value)}
+        className="border-gray-500 border-2 rounded-md p-2 m-2"
+      />
+      {errors.vehicleNumber && <p className="text-red-600 ml-2">{errors.vehicleNumber}</p>}
+
+      <br />
+
+      <input
+        type="text"
+        placeholder="Driving License Number"
+        value={licenseNumber}
+        onChange={(e) => setLicenseNumber(e.target.value)}
+        className="border-gray-500 border-2 rounded-md p-2 m-2"
+      />
+      {errors.licenseNumber && <p className="text-red-600 ml-2">{errors.licenseNumber}</p>}
+
+      <br />
+
+      <input
+        type="file"
+        placeholder="Driving License"
+        onChange={(e) => {}}
+        className="border-gray-500 border-2 rounded-md p-2 m-2"
+      />
+      <br />
+
+      <button
+        type="submit"
+        onClick={submitHandler}
+        className="bg-black rounded-md text-white p-2"
+      >
+        Sign Up
+      </button>
+      <br />
+
+      <span>
+        Already have an account?{" "}
+        <Link to="/captain/login" className="text-blue-600">
+          Login here
+        </Link>
+      </span>
+    </div>
+  );
+};
+
+export default CaptainSignup;
