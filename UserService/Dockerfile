@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:alpine
 WORKDIR /user-service
 COPY . .
 RUN npm install

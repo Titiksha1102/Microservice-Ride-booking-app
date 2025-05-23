@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:alpine
 WORKDIR /ride-service
 COPY . .
 RUN npm install

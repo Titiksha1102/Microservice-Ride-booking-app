@@ -28,13 +28,14 @@ const CaptainSignup = () => {
       .required("Password is required"),
     vehicleNumber: Yup.string()
       .matches(
-        /^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/,
-        "Invalid vehicle number format"
+        /^[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}$/,
+        "Vehicle Number must be in the format XX00XX0000"
       )
       .required("Vehicle number is required"),
     licenseNumber: Yup.string()
-      .matches(/^[A-Z0-9]{8,15}$/, "Invalid license number")
-      .required("License number is required"),
+      .matches(/^[A-Z]{2}\d{2}\d{4}\d{7}$/
+, "License number must be in the format SSRRYYYYNNNNNNN")
+      .required(""),
   });
 
   async function submitHandler() {
