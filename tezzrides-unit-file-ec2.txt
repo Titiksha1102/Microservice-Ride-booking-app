@@ -1,0 +1,15 @@
+[Unit]
+Description=Tezzrides App Backend Microservices
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/home/ubuntu/Microservice-Ride-booking-app/start-tezzrides-app.sh
+ExecStop=/snap/bin/docker compose -f /home/ubuntu/Microservice-Ride-booking-app/docker-compose.yml down
+WorkingDirectory=/home/ubuntu/Microservice-Ride-booking-app
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
