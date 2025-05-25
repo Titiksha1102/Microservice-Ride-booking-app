@@ -57,7 +57,7 @@ const CaptainSignup = () => {
 
       // Send request if validation passes
       const response = await axios.post(
-        "http://localhost:4002/captains/register",
+        `${VITE_CAPTAIN_SERVICE_URL}/captains/register`,
         captain
       );
 

@@ -72,7 +72,7 @@ const CaptainHome = () => {
   useEffect(() => {
     if (!isLoaded) return; // wait for Maps API to load
 
-    const socket = io("http://localhost:4005");
+    const socket = io(`${VITE_WS_URL}`);
 
     socket.on("connect", () => {
       console.log("Connected to Socket.io server");

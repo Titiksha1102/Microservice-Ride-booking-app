@@ -76,7 +76,7 @@ const PlacesComponent4 = () => {
         const latlongOrigin = await getCoordinatesFromAddress(originRef.current.value)
         const latlongDestination=await getCoordinatesFromAddress(destinationRef.current.value)
         const response = await axios.post(
-            'http://localhost:4003/ride/createRide',
+            `${VITE_RIDE_SERVICE_URL}/ride/createRide`,
             {
               pickup: latlongOrigin,
               drop: latlongDestination

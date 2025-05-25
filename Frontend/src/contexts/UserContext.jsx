@@ -33,7 +33,7 @@ export const UserContextProvider = (props) => {
         setLoading(true); // NEW
         try {
             const response = await axios.post(
-                "http://localhost:4001/users/renewaccesstoken", {},
+                `${VITE_USER_SERVICE_URL}/users/renewaccesstoken`, {},
                 { withCredentials: true }
             );
 
