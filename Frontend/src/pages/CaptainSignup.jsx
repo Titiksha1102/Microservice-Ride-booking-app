@@ -57,7 +57,7 @@ const CaptainSignup = () => {
 
       // Send request if validation passes
       const response = await axios.post(
-        `${VITE_CAPTAIN_SERVICE_URL}/captains/register`,
+        `${import.meta.env.VITE_CAPTAIN_SERVICE_URL}/captains/register`,
         captain
       );
 

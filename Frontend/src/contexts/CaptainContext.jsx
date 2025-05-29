@@ -14,7 +14,7 @@ export const CaptainContextProvider = (props) => {
         setLoading(true); // NEW
         try {
             const response = await axios.post(
-                `${VITE_CAPTAIN_SERVICE_URL}/captains/renewaccesstoken`, {},
+                `${import.meta.env.VITE_CAPTAIN_SERVICE_URL}/captains/renewaccesstoken`, {},
                 { withCredentials: true }
             );
 

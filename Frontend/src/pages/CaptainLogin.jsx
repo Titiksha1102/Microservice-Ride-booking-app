@@ -29,7 +29,7 @@ const CaptainLogin = () => {
       await loginSchema.validate(captain, { abortEarly: false });
       setErrors({}); // clear previous errors if any
 
-      const response = await axios.post(`${VITE_CAPTAIN_SERVICE_URL}/captains/login`, captain, {
+      const response = await axios.post(`${import.meta.env.VITE_CAPTAIN_SERVICE_URL}/captains/login`, captain, {
         withCredentials: true,
       });
 

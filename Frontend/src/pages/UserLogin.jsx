@@ -25,7 +25,7 @@ const UserLogin = () => {
       await schema.validate(user, { abortEarly: false }); // Validate all fields
       setErrors({}); // Clear previous errors
 
-      const response = await axios.post(`${VITE_USER_SERVICE_URL}/users/login`, user, { withCredentials: true });
+      const response = await axios.post(`${import.meta.env.VITE_USER_SERVICE_URL}/users/login`, user, { withCredentials: true });
       const data = response.data;
 
       context.setAccessToken(data.accessToken);

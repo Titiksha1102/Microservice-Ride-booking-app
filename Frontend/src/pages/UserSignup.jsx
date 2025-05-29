@@ -28,7 +28,7 @@ const UserSignup = () => {
       setErrors({});
       setWarning('');
 
-      const response = await axios.post(`${VITE_USER_SERVICE_URL}/users/register`, user);
+      const response = await axios.post(`${import.meta.env.VITE_USER_SERVICE_URL}/users/register`, user);
 
       if (response.status === 200 || response.status === 201) {
         navigate('/user/login');
