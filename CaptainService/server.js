@@ -17,8 +17,8 @@ connectDB();
               origin: ['http://localhost:5173',
                 'http://localhost:4003',
                 'http://localhost:5174',
-                'http://user-app.tezzridesapp.click',
-                'http://captain-app.tezzridesapp.click',],
+                'http://www.tezzridesapp.click',
+        'https://www.tezzridesapp.click'],
               credentials: true,
             }));
             server.use(cookieParser());
